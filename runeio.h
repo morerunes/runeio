@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 FILE*		fSafeOpen		(const char*, char*);
-void		fSafeClose		(FILE*);
 
 void		fSafeRead		(void*, size_t, size_t, FILE*);
 void		fSafeReadNTS	(void*, long, FILE*);
@@ -18,7 +17,7 @@ void		fSafeWriteNTS	(const char*, FILE*);
 void		fSafeRRead		(void*, size_t, size_t, FILE*, long offset);
 void		fSafeRReadNTS	(void*, long max, FILE*, long offset);
 
-void		baseNameFromURI	(const char*, char*);
+void		baseNameFromURI	(const char*, long max, char*);
 long		filesize	(FILE*);
 
 #endif

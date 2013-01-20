@@ -2,13 +2,13 @@
  * RuneIO - A tiny library for performing common binary file operations
  */
 
-// TODO: Keep track of opened files!
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include "runeio.h"
+
+#define NDEBUG
 
 #ifndef NDEBUG
 #include <assert.h>
@@ -56,16 +56,21 @@ int main(void) {
 		fSafeWrite(debugdata, strlen(debugdata) + 1, 1, debugfile);
 	}
 
-	rewind(debugfile);
-	fSafeRead(debugdatacopy, 1, (strlen(debugdata) + 1) * 5, debugfile);
+	debugdata = "C:\\Program Files (x86)\\Users\\default\\test.exe";
+	debugdatacopy = realloc(debugdatacopy, 1000);
 
+	baseNameFromURI(debugdata, 300l, debugdatacopy);
+	assert(!strcmp("test.exe", debugdatacopy));
 
 	free(debugdatacopy);
+
+	printf("Tests passed!\n");
 
 	return 0;
 }
 #endif
 
+// -- MISC FUNCTIONS -- //
 
 /**
  * Opens a file safely, stopping execution upon failure.
@@ -92,6 +97,22 @@ FILE* fSafeOpen(const char *filename, char *mode) {
 }
 
 /**
+ * Returns to size of the file in bytes
+ *
+ * @param stream - A pointer to a FILE object to read from.
+ * @return long - The size of the file in bytes
+ */
+long filesize(FILE *stream) {
+	long pos = ftell(stream);
+	fseek(stream, 0, SEEK_END);
+	long endpos = ftell(stream);
+	fseek(stream, pos, SEEK_SET);
+	return endpos;
+}
+
+// -- READING FUNCTIONS -- //
+
+/**
  * Reads data safely, stopping execution upon failure or unexpected EOF
  *
  * @param data - A pointer to preallocated memory to store the data
@@ -113,7 +134,7 @@ void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
 	long pos = ftell(stream);
 
 	if ((filesize(stream) - pos - (size * count)) < 0) {
-		printf("You cannot read past the end of the file! Tried to read %i bytes out of remaining %i!\n",
+		printf("You cannot read past the end of the file! Tried to read %i bytes out of remaining %li!\n",
 				(size * count), (filesize(stream) - pos));
 		exit(1);
 	} else {
@@ -143,7 +164,7 @@ void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
  * @param stream (FILE*) - A pointer to a FILE object to read from.
  */
 void fSafeReadNTS(void *data, long max, FILE *stream) {
-	int8_t *buffer;
+	char *buffer;
 	long i = 0;
 	int8_t finished = 0;
 
@@ -223,6 +244,8 @@ void fSafeRRead(void *data, size_t size, size_t count, FILE *stream, long offset
 	fseek(stream, offset, SEEK_SET);
 }
 
+// -- WRITING FUNCTIONS -- //
+
 /**
  * Writes a null terminated string to a file safely
  *
@@ -276,19 +299,32 @@ void fSafeWrite(void *data, size_t size, size_t count, FILE *stream) {
 }
 
 /**
- * Returns to size of the file in bytes
+ * Takes any string of a URI/URL and puts only the last portion (removing any directory info) into the provided char*
  *
- * @param stream - A pointer to a FILE object to read from.
- * @return long - The size of the file in bytes
+ * @param uri (const char*) - The URI/URL to parse
+ * @param max (long) - The space available to store the resultant string. This should be at least as long as the input string
+ * @param destination (char*) - The place to put the resultant string.
  */
-long filesize(FILE *stream) {
-	long pos = ftell(stream);
-	fseek(stream, 0, SEEK_END);
-	long endpos = ftell(stream);
-	fseek(stream, pos, SEEK_SET);
-	return endpos;
-}
+void baseNameFromURI(const char *uri, long max, char *destination) {
+	if (uri == NULL) {
+		printf("baseNameFromURI received null pointer for input string! Aborting.\n");
+		exit(1);
+	}
 
+	if (destination == NULL) {
+		printf("baseNameFromURI received null pointer for destination! Aborting.\n");
+		exit(1);
+	}
+
+	if (strrchr(uri, '\\') == strrchr(uri, '/')) {
+		// There aren't any slashes
+		strcpy(destination, uri);
+	} else if (strrchr(uri, '\\') > strrchr(uri, '/')) {
+		strcpy(destination, strrchr(uri, '\\') + 1);
+	} else {
+		strcpy(destination, strrchr(uri, '/') + 1);
+	}
+}
 
 
 
