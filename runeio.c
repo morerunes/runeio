@@ -8,8 +8,6 @@
 #include <inttypes.h>
 #include "runeio.h"
 
-#define NDEBUG
-
 #ifndef NDEBUG
 #include <assert.h>
 int main(void) {
