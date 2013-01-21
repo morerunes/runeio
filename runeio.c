@@ -8,6 +8,8 @@
 #include <inttypes.h>
 #include "runeio.h"
 
+#define NDEBUG
+
 #ifndef NDEBUG
 #include <assert.h>
 int main(void) {
@@ -70,14 +72,6 @@ int main(void) {
 
 // -- MISC FUNCTIONS -- //
 
-/**
- * Opens a file safely, stopping execution upon failure.
- * Will return null pointer if you have opened too many files already.
- *
- * @param filename - The name of the file to be opened
- * @param mode - The file access mode to be used (see fopen)
- * @return FILE* - a pointer to the opened file
- */
 FILE* fSafeOpen(const char *filename, char *mode) {
 	FILE *file;
 	if (strlen(filename) > FILENAME_MAX) {
@@ -94,12 +88,6 @@ FILE* fSafeOpen(const char *filename, char *mode) {
 	return file;
 }
 
-/**
- * Returns to size of the file in bytes
- *
- * @param stream - A pointer to a FILE object to read from.
- * @return long - The size of the file in bytes
- */
 long filesize(FILE *stream) {
 	long pos = ftell(stream);
 	fseek(stream, 0, SEEK_END);
@@ -110,14 +98,6 @@ long filesize(FILE *stream) {
 
 // -- READING FUNCTIONS -- //
 
-/**
- * Reads data safely, stopping execution upon failure or unexpected EOF
- *
- * @param data - A pointer to preallocated memory to store the data
- * @param size - The size in bytes of each element to read
- * @param count - The number of elements to read
- * @param stream - A pointer to a FILE object to read from
- */
 void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
 	if (data == NULL) {
 		printf("fSafeRead was given NULL data pointer! Aborting.\n");
@@ -150,17 +130,6 @@ void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
 	}
 }
 
-/**
- * Reads a null-terminated string from a binary file
- *
- * If the string in the file is longer than (max - 1) it will continue to read
- * until a null is reached, but will not place any more characters into the
- * given data pointer. Will ensure the string is null terminated at (data).
- *
- * @param data - A pointer to the location location to store the read string
- * @param max (long) - The number of bytes available at (data).
- * @param stream (FILE*) - A pointer to a FILE object to read from.
- */
 void fSafeReadNTS(void *data, long max, FILE *stream) {
 	char *buffer;
 	long i = 0;
@@ -215,28 +184,11 @@ void fSafeReadNTS(void *data, long max, FILE *stream) {
 	free(buffer);
 }
 
-/**
- * Safely reads a null terminated string from a file using fSafeReadNTS, then uses fseek to move to the offset specified
- *
- * @param data - A pointer to the location in memory to store the read string
- * @param max (long) - The space available for the string (including null at end)
- * @param stream (FILE*) - A pointer to a FILE object to read from
- * @param offset (long) - The offset in the file to move to when finished reading
- */
 void fSafeRReadNTS(void *data, long max, FILE *stream, long offset) {
 	fSafeReadNTS(data, max, stream);
 	fseek(stream, offset, SEEK_SET);
 }
 
-/**
- * Safely reads a file using fSafeRead, then uses fseek to move the file pointer to the offset specified
- *
- * @param data - Preallocated memory to hold the data read
- * @param size (size_t) - The size of each element to read
- * @param count (size_t) - The number of elements to read
- * @param stream (FILE*) - A pointer to a FILE object to read from
- * @param offset (long) - The offset in the file to move to when finished reading
- */
 void fSafeRRead(void *data, size_t size, size_t count, FILE *stream, long offset) {
 	fSafeRead(data, size, count, stream);
 	fseek(stream, offset, SEEK_SET);
@@ -244,12 +196,6 @@ void fSafeRRead(void *data, size_t size, size_t count, FILE *stream, long offset
 
 // -- WRITING FUNCTIONS -- //
 
-/**
- * Writes a null terminated string to a file safely
- *
- * @param string (const char*) - The null terminated string to write to the file
- * @param stream (FILE*) - A pointer to a FILE object to write to
- */
 void fSafeWriteNTS(const char *string, FILE *stream) {
 	if (stream == NULL) {
 		printf("fSafeWriteNTS was given NULL file stream. Did you forget to use fSafeOpen?\n");
@@ -271,14 +217,6 @@ void fSafeWriteNTS(const char *string, FILE *stream) {
 	} while (string[i] != '\0');
 }
 
-/**
- * Safely writes data to a file
- *
- * @param data - A pointer to the block of data you wish to write from
- * @param size (size_t) - The size of each element to write in bytes
- * @param count (size_t) - The number of elements to write
- * @param stream (FILE*) - A pointer to a FILE object to write to
- */
 void fSafeWrite(void *data, size_t size, size_t count, FILE *stream) {
 	if (data == NULL) {
 		printf("fSafeWrite was given a null pointer for data. Aborting.\n");
@@ -296,13 +234,6 @@ void fSafeWrite(void *data, size_t size, size_t count, FILE *stream) {
 	}
 }
 
-/**
- * Takes any string of a URI/URL and puts only the last portion (removing any directory info) into the provided char*
- *
- * @param uri (const char*) - The URI/URL to parse
- * @param max (long) - The space available to store the resultant string. This should be at least as long as the input string
- * @param destination (char*) - The place to put the resultant string.
- */
 void baseNameFromURI(const char *uri, long max, char *destination) {
 	if (uri == NULL) {
 		printf("baseNameFromURI received null pointer for input string! Aborting.\n");
@@ -323,10 +254,4 @@ void baseNameFromURI(const char *uri, long max, char *destination) {
 		strcpy(destination, strrchr(uri, '/') + 1);
 	}
 }
-
-
-
-
-
-
 
