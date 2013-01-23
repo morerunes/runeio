@@ -20,7 +20,7 @@
  * @see fopen
  * @return FILE* - a pointer to the opened file
  */
-FILE*		fSafeOpen		(const char*, char*);
+FILE*		fSafeOpen			(const char*, char*);
 
 /**
  * Reads data safely, stopping execution upon failure or unexpected EOF
@@ -30,7 +30,7 @@ FILE*		fSafeOpen		(const char*, char*);
  * @param count - The number of elements to read
  * @param stream - A pointer to a FILE object to read from
  */
-void		fSafeRead		(void*, size_t, size_t, FILE*);
+void		fSafeRead			(void*, size_t, size_t, FILE*);
 
 /**
  * Reads a null-terminated string from a binary file
@@ -43,7 +43,7 @@ void		fSafeRead		(void*, size_t, size_t, FILE*);
  * @param max (long) - The number of bytes available at (data).
  * @param stream (FILE*) - A pointer to a FILE object to read from.
  */
-void		fSafeReadNTS	(void*, long, FILE*);
+void		fSafeReadNTS			(void*, long, FILE*);
 
 /**
  * Safely writes data to a file
@@ -53,7 +53,7 @@ void		fSafeReadNTS	(void*, long, FILE*);
  * @param count (size_t) - The number of elements to write
  * @param stream (FILE*) - A pointer to a FILE object to write to
  */
-void		fSafeWrite		(void*, size_t, size_t, FILE*);
+void		fSafeWrite			(void*, size_t, size_t, FILE*);
 
 /**
  * Writes a null terminated string to a file safely
@@ -61,7 +61,7 @@ void		fSafeWrite		(void*, size_t, size_t, FILE*);
  * @param string (const char*) - The null terminated string to write to the file
  * @param stream (FILE*) - A pointer to a FILE object to write to
  */
-void		fSafeWriteNTS	(const char*, FILE*);
+void		fSafeWriteNTS			(const char*, FILE*);
 
 /**
  * Safely reads a file using fSafeRead, then uses fseek to move the file pointer to the offset specified
@@ -72,7 +72,7 @@ void		fSafeWriteNTS	(const char*, FILE*);
  * @param stream (FILE*) - A pointer to a FILE object to read from
  * @param offset (long) - The offset in the file to move to when finished reading
  */
-void		fSafeRRead		(void*, size_t, size_t, FILE*, long offset);
+void		fSafeRRead			(void*, size_t, size_t, FILE*, long offset);
 
 /**
  * Safely reads a null terminated string from a file using fSafeReadNTS, then uses fseek to move to the offset specified
@@ -82,7 +82,7 @@ void		fSafeRRead		(void*, size_t, size_t, FILE*, long offset);
  * @param stream (FILE*) - A pointer to a FILE object to read from
  * @param offset (long) - The offset in the file to move to when finished reading
  */
-void		fSafeRReadNTS	(void*, long max, FILE*, long offset);
+void		fSafeRReadNTS			(void*, long max, FILE*, long offset);
 
 /**
  * Takes any string of a URI/URL and puts only the last portion (removing any directory info) into the provided char*
@@ -91,7 +91,15 @@ void		fSafeRReadNTS	(void*, long max, FILE*, long offset);
  * @param max (long) - The space available to store the resultant string. This should be at least as long as the input string
  * @param destination (char*) - The place to put the resultant string.
  */
-void		baseNameFromURI	(const char*, long max, char*);
+void		filenameFromURI			(const char*, long max, char*);
+
+/**
+ * Takes a filename and writes it into destination without its extension (provided it has one)
+ *
+ * @param filename (const char*) - The filename to parse
+ * @param destination (char*) - The location to store the resultant
+ */
+void		baseNameFromFilename		(const char*, char*);
 
 /**
  * Returns to size of the file in bytes
@@ -99,6 +107,6 @@ void		baseNameFromURI	(const char*, long max, char*);
  * @param stream - A pointer to a FILE object to read from.
  * @return long - The size of the file in bytes
  */
-long		filesize	(FILE*);
+long		filesize			(FILE*);
 
 #endif
