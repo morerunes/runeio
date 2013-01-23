@@ -42,8 +42,9 @@ void		fSafeRead			(void*, size_t, size_t, FILE*);
  * @param data - A pointer to the location location to store the read string
  * @param max (long) - The number of bytes available at (data).
  * @param stream (FILE*) - A pointer to a FILE object to read from.
+ * @return didOverflow - Is 0 if the string was <= (max) characters, 1 otherwise.
  */
-void		fSafeReadNTS			(void*, long, FILE*);
+char		fSafeReadNTS			(void*, long, FILE*);
 
 /**
  * Safely writes data to a file
@@ -65,6 +66,7 @@ void		fSafeWriteNTS			(const char*, FILE*);
 
 /**
  * Safely reads a file using fSafeRead, then uses fseek to move the file pointer to the offset specified
+ * Guarantees null termination of destination string.
  *
  * @param data - Preallocated memory to hold the data read
  * @param size (size_t) - The size of each element to read
@@ -75,14 +77,16 @@ void		fSafeWriteNTS			(const char*, FILE*);
 void		fSafeRRead			(void*, size_t, size_t, FILE*, long offset);
 
 /**
- * Safely reads a null terminated string from a file using fSafeReadNTS, then uses fseek to move to the offset specified
+ * Safely reads a null terminated string from a file using fSafeReadNTS, then uses fseek to move to the offset specified.
+ * Guarantees null termination of destination string.
  *
  * @param data - A pointer to the location in memory to store the read string
  * @param max (long) - The space available for the string (including null at end)
  * @param stream (FILE*) - A pointer to a FILE object to read from
  * @param offset (long) - The offset in the file to move to when finished reading
+ * @return didOverflow - Is 0 if the string was less than (max) characters, 1 otherwise.
  */
-void		fSafeRReadNTS			(void*, long max, FILE*, long offset);
+char		fSafeRReadNTS			(void*, long max, FILE*, long offset);
 
 /**
  * Takes any string of a URI/URL and puts only the last portion (removing any directory info) into the provided char*

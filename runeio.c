@@ -75,8 +75,7 @@ int main(void) {
 FILE* fSafeOpen(const char *filename, char *mode) {
 	FILE *file;
 	if (strlen(filename) > FILENAME_MAX) {
-		printf(
-				"The file name you provided was too long!\nFile Name: %s has too many characters! (max is %i)\n",
+		printf("The file name you provided was too long!\nFile Name: %s has too many characters! (max is %i)\n",
 				filename, FILENAME_MAX);
 		exit(1);
 	}
@@ -106,16 +105,14 @@ void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
 	}
 
 	if (stream == NULL ) {
-		printf(
-				"fSafeRead was given NULL file pointer! Did you forget to use fSafeOpen? Aborting.\n");
+		printf("fSafeRead was given NULL file pointer! Did you forget to use fSafeOpen? Aborting.\n");
 		exit(1);
 	}
 
 	long pos = ftell(stream);
 
 	if ((filesize(stream) - pos - (size * count)) < 0) {
-		printf(
-				"You cannot read past the end of the file! Tried to read %i bytes out of remaining %li!\n",
+		printf("You cannot read past the end of the file! Tried to read %i bytes out of remaining %li!\n",
 				(size * count), (filesize(stream) - pos));
 		exit(1);
 	} else {
@@ -133,7 +130,7 @@ void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
 	}
 }
 
-void fSafeReadNTS(void *data, long max, FILE *stream) {
+char fSafeReadNTS(void *data, long max, FILE *stream) {
 	char *buffer;
 	long i = 0;
 	int8_t finished = 0;
@@ -144,8 +141,7 @@ void fSafeReadNTS(void *data, long max, FILE *stream) {
 	}
 
 	if (stream == NULL ) {
-		printf(
-				"fSafeReadNTS was given NULL file stream. Did you forget to use fSafeOpen?\n");
+		printf("fSafeReadNTS was given NULL file stream. Did you forget to use fSafeOpen?\n");
 		exit(1);
 	}
 
@@ -155,8 +151,7 @@ void fSafeReadNTS(void *data, long max, FILE *stream) {
 		fread(buffer + i, 1, 1, stream);
 
 		if (feof(stream)) {
-			printf(
-					"Unexpected end of file while reading null terminated string!\n");
+			printf("Unexpected end of file while reading null terminated string!\n");
 			exit(1);
 		}
 
@@ -169,6 +164,8 @@ void fSafeReadNTS(void *data, long max, FILE *stream) {
 		i++;
 	} while (i < (max - 1));
 
+	char result = !finished;
+
 	if (!finished) {
 		*(buffer + i + 1) = '\0';
 		strcpy(data, buffer);
@@ -178,8 +175,7 @@ void fSafeReadNTS(void *data, long max, FILE *stream) {
 		fread(buffer, 1, 1, stream);
 
 		if (feof(stream)) {
-			printf(
-					"Unexpected end of file while reading null terminated string!\n");
+			printf("Unexpected end of file while reading null terminated string!\n");
 			exit(1);
 		}
 
@@ -188,11 +184,13 @@ void fSafeReadNTS(void *data, long max, FILE *stream) {
 	}
 
 	free(buffer);
+	return result;
 }
 
-void fSafeRReadNTS(void *data, long max, FILE *stream, long offset) {
-	fSafeReadNTS(data, max, stream);
+char fSafeRReadNTS(void *data, long max, FILE *stream, long offset) {
+	char result = fSafeReadNTS(data, max, stream);
 	fseek(stream, offset, SEEK_SET);
+	return result;
 }
 
 void fSafeRRead(void *data, size_t size, size_t count, FILE *stream,
@@ -205,14 +203,12 @@ void fSafeRRead(void *data, size_t size, size_t count, FILE *stream,
 
 void fSafeWriteNTS(const char *string, FILE *stream) {
 	if (stream == NULL ) {
-		printf(
-				"fSafeWriteNTS was given NULL file stream. Did you forget to use fSafeOpen?\n");
+		printf("fSafeWriteNTS was given NULL file stream. Did you forget to use fSafeOpen?\n");
 		exit(1);
 	}
 
 	if (string == NULL ) {
-		printf(
-				"fSafeWriteNTS was given NULL pointer for string. Did you forget to initialize your char*?\n");
+		printf("fSafeWriteNTS was given NULL pointer for string. Did you forget to initialize your char*?\n");
 		exit(1);
 	}
 
@@ -233,8 +229,7 @@ void fSafeWrite(void *data, size_t size, size_t count, FILE *stream) {
 	}
 
 	if (stream == NULL ) {
-		printf(
-				"fSafeWrite was given a null FILE pointer. Did you remember to use fSafeOpen?\n");
+		printf("fSafeWrite was given a null FILE pointer. Did you remember to use fSafeOpen?\n");
 		exit(1);
 	}
 
@@ -246,14 +241,12 @@ void fSafeWrite(void *data, size_t size, size_t count, FILE *stream) {
 
 void filenameFromURI(const char *uri, long max, char *destination) {
 	if (uri == NULL ) {
-		printf(
-				"baseNameFromURI received null pointer for input string! Aborting.\n");
+		printf("baseNameFromURI received null pointer for input string! Aborting.\n");
 		exit(1);
 	}
 
 	if (destination == NULL ) {
-		printf(
-				"baseNameFromURI received null pointer for destination! Aborting.\n");
+		printf("baseNameFromURI received null pointer for destination! Aborting.\n");
 		exit(1);
 	}
 
@@ -271,11 +264,11 @@ void baseNameFromFilename(const char *filename, char *destination) {
 	char *lastDot = strrchr(filename, '.');
 
 	if (filename == destination) {
-		if (lastDot != NULL) {
+		if (lastDot != NULL ) {
 			*lastDot = '\0';
 		} // else nothing needs to be done
 	} else {
-		if (lastDot == NULL) {
+		if (lastDot == NULL ) {
 			strcpy(destination, filename);
 		} else {
 			strncpy(destination, filename, lastDot - filename);
