@@ -108,9 +108,17 @@ void		baseNameFromFilename		(const char*, char*);
 /**
  * Returns to size of the file in bytes
  *
- * @param stream - A pointer to a FILE object to read from.
- * @return long - The size of the file in bytes
+ * @param stream (FILE*) - A pointer to a FILE object to read from.
+ * @return size (long) - The size of the file in bytes
  */
-long		filesize			(FILE*);
+long		filesize				(FILE*);
+
+/**
+ * Returns the size of a null terminated string at the current place in the given FILE
+ * Includes the null terminator as part of the size
+ *
+ * @param file (FILE*) - A pointer to a FILE object to read from
+ */
+long		nullTermStringSize		(FILE*);
 
 #endif

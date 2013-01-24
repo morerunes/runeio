@@ -276,3 +276,17 @@ void baseNameFromFilename(const char *filename, char *destination) {
 		}
 	}
 }
+
+long nullTermStringSize(FILE *file) {
+	long origPos = ftell(file);
+	char testChar = '0';
+
+	while (testChar != '\0') {
+		fSafeRead(&testChar, 1, 1, file);
+	}
+
+	origPos = (ftell(file) - origPos);
+	fseek(file, origPos, SEEK_SET);
+
+	return origPos;
+}
