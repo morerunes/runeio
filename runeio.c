@@ -88,7 +88,7 @@ FILE* fSafeOpen(const char *filename, char *mode) {
 	return file;
 }
 
-long filesize(FILE *stream) {
+long getFilesize(FILE *stream) {
 	long pos = ftell(stream);
 	fseek(stream, 0, SEEK_END);
 	long endpos = ftell(stream);
@@ -109,11 +109,16 @@ void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
 		exit(1);
 	}
 
+	if (size < 0 || count < 0) {
+		printf("You cannot read %li bytes! Aborting\n", size * count);
+		exit(1);
+	}
+
 	long pos = ftell(stream);
 
-	if ((filesize(stream) - pos - (size * count)) < 0) {
+	if ((getFilesize(stream) - pos - (size * count)) < 0) {
 		printf("You cannot read past the end of the file! Tried to read %i bytes out of remaining %li!\n",
-				(size * count), (filesize(stream) - pos));
+				(size * count), (getFilesize(stream) - pos));
 		exit(1);
 	} else {
 		fseek(stream, pos, SEEK_SET);
@@ -142,6 +147,11 @@ char fSafeReadNTS(void *data, long max, FILE *stream) {
 
 	if (stream == NULL ) {
 		printf("fSafeReadNTS was given NULL file stream. Did you forget to use fSafeOpen?\n");
+		exit(1);
+	}
+
+	if (max < 0) {
+		printf("(fSafeReadNTS) Max cannot be a negative number! Aborting.\n");
 		exit(1);
 	}
 
@@ -193,8 +203,11 @@ char fSafeRReadNTS(void *data, long max, FILE *stream, long offset) {
 	return result;
 }
 
-void fSafeRRead(void *data, size_t size, size_t count, FILE *stream,
-		long offset) {
+void fSafeRRead(void *data, size_t size, size_t count, FILE *stream, long offset) {
+	if (offset < 0) {
+		printf("%li is not a valid file offset! (fSafeRRead) Aborting.\n", offset);
+		exit(1);
+	}
 	fSafeRead(data, size, count, stream);
 	fseek(stream, offset, SEEK_SET);
 }
@@ -233,6 +246,11 @@ void fSafeWrite(void *data, size_t size, size_t count, FILE *stream) {
 		exit(1);
 	}
 
+	if (size < 0 || count < 0) {
+		printf("You cannot read %li bytes! Aborting\n", size * count);
+		exit(1);
+	}
+
 	if (fwrite(data, size, count, stream) != count) {
 		printf("Error writing file data within fSafeWrite. Aborting!\n");
 		exit(1);
@@ -247,6 +265,11 @@ void filenameFromURI(const char *uri, long max, char *destination) {
 
 	if (destination == NULL ) {
 		printf("baseNameFromURI received null pointer for destination! Aborting.\n");
+		exit(1);
+	}
+
+	if (max < 0) {
+		printf("(filenameFromURI) Max cannot be less than zero! Aborting.\n");
 		exit(1);
 	}
 
