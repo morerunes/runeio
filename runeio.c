@@ -70,25 +70,48 @@ int main(void) {
 }
 #endif
 
+static char verbose = 0;
+
 // -- MISC FUNCTIONS -- //
+void setverbose() { verbose = 1; }
 
 FILE* fSafeOpen(const char *filename, char *mode) {
 	FILE *file;
+
+	if (filename == NULL) {
+		printf("Null pointer given to fSafeOpen for filename. Aborting.\n");
+		exit(1);
+	}
+
+	if (mode == NULL) {
+		printf("Null pointer given to fSafeOpen for mode. Aborting\n");
+		exit(1);
+	}
+
 	if (strlen(filename) > FILENAME_MAX) {
 		printf("The file name you provided was too long!\nFile Name: %s has too many characters! (max is %i)\n",
 				filename, FILENAME_MAX);
 		exit(1);
 	}
 
+	if (verbose) printf("Opening file %s with mode %s\n", filename, mode);
+
 	if ((file = fopen(filename, mode)) == NULL ) {
 		fputs("Could not open file! Are you sure the file exists?\n", stderr);
 		exit(1);
 	}
 
+	if (verbose) printf("Opened file successfully\n");
+
 	return file;
 }
 
 long getFilesize(FILE *stream) {
+	if (verbose) printf("Getting file size\n");
+	if (stream == NULL) {
+		printf("getFilesize was given null pointer for stream. Aborting.\n");
+		exit(1);
+	}
 	long pos = ftell(stream);
 	fseek(stream, 0, SEEK_END);
 	long endpos = ftell(stream);
@@ -114,17 +137,19 @@ void fSafeRead(void *data, size_t size, size_t count, FILE *stream) {
 		exit(1);
 	}
 
+	if (verbose) printf("Reading %li bytes from file\n", size * count);
+
 	long pos = ftell(stream);
 
 	if ((getFilesize(stream) - pos - (size * count)) < 0) {
-		printf("You cannot read past the end of the file! Tried to read %i bytes out of remaining %li!\n",
-				(size * count), (getFilesize(stream) - pos));
+		printf("You cannot read past the end of the file! Tried to read %li bytes out of remaining %li!\n",
+				(long) (size * count), (getFilesize(stream) - pos));
 		exit(1);
 	} else {
 		fseek(stream, pos, SEEK_SET);
 
 		if (fread(data, size, count, stream) != count) {
-			printf("Attempt to read %i elements from file failed!\n", count);
+			printf("Attempt to read %li elements from file failed!\n", (long) count);
 			exit(1);
 		}
 
@@ -301,15 +326,15 @@ void baseNameFromFilename(const char *filename, char *destination) {
 }
 
 long nullTermStringSize(FILE *file) {
-	long origPos = ftell(file);
+	long size, origPos = ftell(file);
 	char testChar = '0';
 
 	while (testChar != '\0') {
 		fSafeRead(&testChar, 1, 1, file);
 	}
 
-	origPos = (ftell(file) - origPos);
+	size = (ftell(file) - origPos);
 	fseek(file, origPos, SEEK_SET);
 
-	return origPos;
+	return size;
 }

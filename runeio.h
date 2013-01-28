@@ -12,6 +12,11 @@
 #include <stdio.h>
 
 /**
+ * Enables verbose output
+ */
+void setverbose();
+
+/**
  * Opens a file safely, stopping execution upon failure.
  * Will return null pointer if you have opened too many files already.
  *
